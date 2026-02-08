@@ -8,6 +8,7 @@ import {
   AnthropicOfficialConfig,
   AnthropicVertexConfig,
 } from './providers/anthropic';
+import type { CustomProviderConfig } from './providers/custom';
 import type { FalConfig } from './providers/fal';
 import { GeminiGenerativeConfig, GeminiVertexConfig } from './providers/gemini';
 import { MorphConfig } from './providers/morph';
@@ -28,6 +29,7 @@ declare global {
       scenarios: ConfigItem<CopilotPromptScenario>;
       providers: {
         openai: ConfigItem<OpenAIConfig>;
+        custom: ConfigItem<CustomProviderConfig>;
         fal: ConfigItem<FalConfig>;
         gemini: ConfigItem<GeminiGenerativeConfig>;
         geminiVertex: ConfigItem<GeminiVertexConfig>;
@@ -70,6 +72,43 @@ defineModuleConfig('copilot', {
       baseURL: 'https://api.openai.com/v1',
     },
     link: 'https://github.com/openai/openai-node',
+  },
+  'providers.custom': {
+    desc: 'The config for the custom OpenAI-compatible provider. Supports any OpenAI-compatible API (e.g., OpenRouter, Together AI, LocalAI, Ollama, vLLM, etc.).',
+    default: {
+      apiKey: '',
+      baseURL: '',
+      models: [],
+      name: 'custom',
+    },
+    schema: {
+      type: 'object',
+      description:
+        'Custom OpenAI-compatible provider configuration for self-hosted or third-party LLM services.',
+      properties: {
+        apiKey: {
+          type: 'string',
+          description: 'API key for authentication with the custom provider.',
+        },
+        baseURL: {
+          type: 'string',
+          description:
+            'Base URL of the OpenAI-compatible API endpoint (e.g., http://localhost:11434/v1 for Ollama, https://openrouter.ai/api/v1 for OpenRouter).',
+        },
+        models: {
+          type: 'array',
+          items: { type: 'string' },
+          description:
+            'List of model IDs available from this provider. If not specified, the system will try to fetch available models from the /models endpoint.',
+        },
+        name: {
+          type: 'string',
+          description:
+            'Optional name for this custom provider (for logging purposes).',
+        },
+      },
+      required: ['apiKey', 'baseURL'],
+    },
   },
   'providers.fal': {
     desc: 'The config for the fal provider.',
